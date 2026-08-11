@@ -9,3 +9,4 @@ tsconfig.json
 .git/**
 *.vsix
 media/*.pdf
+media/logoospv.png

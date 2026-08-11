@@ -3,8 +3,8 @@
   "displayName": "OpenSpec Previewer",
   "description": "Previsualizador dedicado para proyectos OpenSpec: cambios, tareas (interactivas), specs activas y archivadas.",
   "version": "0.1.0",
-  "publisher": "jsoncr",
-  "author": "jsoncr",
+  "publisher": "jcruz",
+  "author": "jcruz",
   "license": "MIT",
   "icon": "media/icon.png",
   "repository": {

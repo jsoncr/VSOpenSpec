@@ -2,6 +2,16 @@
 
 A dedicated VS Code extension to preview and navigate [OpenSpec](https://openspec.dev/) projects without opening every `.md` file by hand.
 
+## Preview
+
+Interactive task tree and themed `tasks.md` preview with live progress:
+
+![OpenSpec tree and task preview](media/screenshot001.png)
+
+Per-change inline actions (run pending tasks / archive), active specs and archived changes:
+
+![OpenSpec change actions, specs and archive](media/screenshot002.png)
+
 ## Features
 
 - **Dedicated sidebar** (OpenSpec icon in the Activity Bar) with a navigable tree:

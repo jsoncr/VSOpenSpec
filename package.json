@@ -3,7 +3,7 @@
   "displayName": "OpenSpec Previewer",
   "description": "%description%",
   "l10n": "./l10n",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "publisher": "jcruz",
   "author": "jcruz",
   "license": "MIT",
@@ -181,7 +181,8 @@
     "compile": "node esbuild.js",
     "watch": "node esbuild.js --watch",
     "package": "node esbuild.js --production",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "package:vsix": "npx @vscode/vsce package"
   },
   "dependencies": {
     "markdown-it": "^14.1.0"

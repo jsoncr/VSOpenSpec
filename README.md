@@ -1,36 +1,49 @@
 # OpenSpec Previewer
 
-Extensión de VSCode para previsualizar y navegar proyectos [OpenSpec](https://openspec.dev/) sin abrir los `.md` a mano.
+A dedicated VS Code extension to preview and navigate [OpenSpec](https://openspec.dev/) projects without opening every `.md` file by hand.
 
-## Características
+## Features
 
-- **Sidebar dedicado** (ícono OpenSpec en la barra de actividad) con un árbol navegable:
-  - **Cambios activos** → cada cambio muestra su progreso de tareas (`8/10 · 80%`).
-    - Artefactos: Propuesta, Diseño, Tareas y spec deltas.
-  - **Specs activas** (por capacidad).
-  - **Archivados** (cambios completados).
-- **Preview renderizado** de cualquier `.md` con estilo integrado al tema (light/dark).
-- **Tareas interactivas**: marca/desmarca checkboxes desde el árbol o desde el preview
-  y se reescribe el `tasks.md` real.
-- **Auto-refresco** al cambiar archivos dentro de `openspec/`.
-- Soporta **monorepos**: detecta varias carpetas `openspec/` en el workspace.
-- **Acciones por cambio** (botones inline):
-  - ▶ **Ejecutar tareas pendientes**: aparece cuando el cambio tiene tareas sin
-    completar. Abre la terminal integrada en la carpeta del proyecto y escribe el
-    comando del agente configurado (por defecto Claude Code). Por seguridad **no se
-    ejecuta**: revisas y pulsas Enter.
-  - 📦 **Archivar cambio**: aparece cuando todas las tareas están completas (o no hay
-    tareas). Pide confirmación y ejecuta `openspec archive`.
+- **Dedicated sidebar** (OpenSpec icon in the Activity Bar) with a navigable tree:
+  - **Active changes** → each change shows its task progress (`8/10 · 80%`).
+    - Artifacts: Proposal, Design, Tasks and spec deltas.
+  - **Active specs** (per capability).
+  - **Archived** (completed changes).
+- **Rendered preview** of any `.md`, themed to match the editor (light/dark).
+- **Interactive tasks**: toggle checkboxes from the tree or from the preview and the real `tasks.md` is rewritten.
+- **Auto-refresh** on file changes inside `openspec/`.
+- **Monorepo support**: detects multiple `openspec/` folders in the workspace.
+- **Per-change actions** (inline buttons):
+  - ▶ **Run pending tasks**: appears when a change has incomplete tasks. Opens the integrated terminal in the project folder and writes the configured agent command (Claude Code by default). For safety it is **not executed**: you review and press Enter.
+  - 📦 **Archive change**: appears when all tasks are complete (or there are none). Asks for confirmation and runs `openspec archive`.
 
-### Configuración
+## Requirements
 
-| Setting | Por defecto | Descripción |
+- VS Code `^1.84.0`.
+- A workspace containing an `openspec/config.yaml` file (activates the extension).
+- Optional: the [`openspec` CLI](https://openspec.dev/) on your `PATH` to archive changes.
+
+## Extension Settings
+
+| Setting | Default | Description |
 |---|---|---|
-| `openspec.applyCommand` | `claude "/openspec:apply ${changeId}"` | Comando del agente para aplicar tareas. Variables: `${changeId}`, `${cwd}`. |
-| `openspec.archiveCommand` | `openspec archive ${changeId} -y` | Comando para archivar. Variables: `${changeId}`, `${cwd}`. |
-| `openspec.autoRunApply` | `false` | Si es `true`, el comando de aplicar se ejecuta al instante en vez de solo escribirse. |
+| `openspec.applyCommand` | `claude "/openspec:apply ${changeId}"` | Agent command used to apply tasks. Variables: `${changeId}`, `${cwd}`. |
+| `openspec.archiveCommand` | `openspec archive ${changeId} -y` | Command used to archive a change. Variables: `${changeId}`, `${cwd}`. |
+| `openspec.autoRunApply` | `false` | When `true`, the apply command runs instantly instead of only being written to the terminal. |
 
-## Estructura OpenSpec que reconoce
+## Commands
+
+| Command | Description |
+|---|---|
+| `OpenSpec: Refresh` | Reloads the tree. |
+| `OpenSpec: Preview` | Opens the rendered preview of a file. |
+| `OpenSpec: Open source file` | Opens the underlying `.md`. |
+| `OpenSpec: Collapse all` | Collapses the whole tree. |
+| `OpenSpec: Run pending tasks` | Sends the agent command to the terminal. |
+| `OpenSpec: Archive change` | Archives a completed change. |
+| `OpenSpec: Close spec (create deprecation change)` | Creates a deprecation change for an active spec. |
+
+## Recognized OpenSpec structure
 
 ```
 openspec/
@@ -45,19 +58,27 @@ openspec/
     └── archive/
 ```
 
-## Desarrollo
+## Development
 
 ```bash
 npm install
-npm run compile      # build único
-npm run watch        # build en modo watch
+npm run compile      # single build
+npm run watch        # build in watch mode
 ```
 
-Pulsa `F5` en VSCode para abrir una ventana de desarrollo con la extensión cargada.
+Press `F5` in VS Code to open a development window with the extension loaded.
 
-## Empaquetar
+## Packaging
 
 ```bash
 npm run package
-npx @vscode/vsce package   # genera el .vsix instalable
+npx @vscode/vsce package   # generates the installable .vsix
 ```
+
+## Release Notes
+
+See [CHANGELOG.md](CHANGELOG.md).
+
+## License
+
+[MIT](LICENSE)

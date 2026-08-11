@@ -5,6 +5,15 @@
   "version": "0.1.0",
   "publisher": "soin",
   "license": "MIT",
+  "icon": "media/icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jsoncr/VSOpenSpec.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jsoncr/VSOpenSpec/issues"
+  },
+  "homepage": "https://github.com/jsoncr/VSOpenSpec#readme",
   "engines": {
     "vscode": "^1.84.0"
   },

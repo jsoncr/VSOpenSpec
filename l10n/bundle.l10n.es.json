@@ -1,0 +1,22 @@
+{
+  "OpenSpec: command ready in the terminal — review it and press Enter to run.": "OpenSpec: comando listo en la terminal — revisa y pulsa Enter para ejecutar.",
+  "Warning: {0} task(s) still pending.": "Advertencia: quedan {0} tarea(s) pendiente(s).",
+  "Archive": "Archivar",
+  "Archive change \"{0}\"?{1}\n\nIt will be moved to changes/archive and the main specs will be updated.": "¿Archivar el cambio \"{0}\"?{1}\n\nSe moverá a changes/archive y se actualizarán las specs principales.",
+  "Create deprecation change": "Crear change de deprecación",
+  "Close spec \"{0}\"?\n\nA deprecation change will be created with a REMOVED delta. The spec will be removed from the active specs when you archive that change (it is not deleted now).": "¿Cerrar la spec \"{0}\"?\n\nSe creará un change de deprecación con un delta REMOVED. La spec se eliminará de las specs activas cuando archives ese change (no se borra ahora).",
+  "Proposal": "Propuesta",
+  "Design": "Diseño",
+  "Tasks": "Tareas",
+  "Deprecation change created: {0}. Review it and archive it to retire the spec.": "Change de deprecación creado: {0}. Revísalo y archívalo para retirar la spec.",
+  "Could not create the deprecation change: {0}": "No se pudo crear el change de deprecación: {0}",
+  "Active changes": "Cambios activos",
+  "Active specs": "Specs activas",
+  "Archived": "Archivados",
+  "Go to task": "Ir a la tarea",
+  "Double-click to open tasks.md at this task": "Doble clic para abrir el tasks.md en esta tarea",
+  "Double-click to open tasks.md at this line": "Doble clic para abrir el tasks.md en esta línea",
+  "{0} changes · {1} specs": "{0} cambios · {1} specs",
+  "Could not read the file.": "No se pudo leer el archivo.",
+  "tasks completed": "tareas completadas"
+}

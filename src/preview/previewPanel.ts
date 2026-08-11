@@ -128,7 +128,7 @@ export class PreviewPanel {
     try {
       content = fs.readFileSync(artifact.fsPath, "utf8");
     } catch {
-      content = "_No se pudo leer el archivo._";
+      content = "_" + vscode.l10n.t("Could not read the file.") + "_";
     }
 
     const body =
@@ -148,7 +148,9 @@ export class PreviewPanel {
     const header = `
       <div class="progress-header">
         <div class="progress-label">
-          <strong>${stats.done}/${stats.total}</strong> tareas completadas
+          <strong>${stats.done}/${stats.total}</strong> ${escapeHtml(
+            vscode.l10n.t("tasks completed")
+          )}
           <span class="pct">${pct}%</span>
         </div>
         <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
@@ -161,7 +163,9 @@ export class PreviewPanel {
             (task) => `
           <li class="task ${task.done ? "done" : ""}">
             <input type="checkbox" ${task.done ? "checked" : ""} data-line="${task.line}" />
-            <span class="task-text" data-line="${task.line}" title="Doble clic para abrir el tasks.md en esta línea">${escapeHtml(task.text)}</span>
+            <span class="task-text" data-line="${task.line}" title="${escapeHtml(
+              vscode.l10n.t("Double-click to open tasks.md at this line")
+            )}">${escapeHtml(task.text)}</span>
           </li>`
           )
           .join("");
@@ -211,7 +215,7 @@ export class PreviewPanel {
     const fileName = escapeHtml(path.basename(artifact.fsPath));
 
     return `<!DOCTYPE html>
-<html lang="es">
+<html lang="${escapeHtml(vscode.env.language || "en")}">
 <head>
 <meta charset="UTF-8" />
 <meta http-equiv="Content-Security-Policy" content="${csp}" />

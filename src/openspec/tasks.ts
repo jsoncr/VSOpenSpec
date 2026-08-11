@@ -1,5 +1,6 @@
 // Parseo y edición de tasks.md (checkboxes markdown).
 import * as fs from "fs";
+import * as vscode from "vscode";
 import { TaskSection, TaskStats } from "./model";
 
 // Detecta una línea de checkbox markdown: "- [ ] texto" o "- [x] texto".
@@ -17,7 +18,7 @@ export function parseTasks(content: string): TaskSection[] {
   const lines = splitLines(content);
   const sections: TaskSection[] = [];
   // Sección por defecto para tareas que aparecen antes de cualquier encabezado.
-  let current: TaskSection = { title: "Tareas", tasks: [] };
+  let current: TaskSection = { title: vscode.l10n.t("Tasks"), tasks: [] };
   let currentUsed = false;
 
   lines.forEach((raw, index) => {

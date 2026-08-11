@@ -139,21 +139,21 @@ export class OpenSpecTreeProvider
     }
     nodes.push({
       kind: "category",
-      label: "Cambios activos",
+      label: vscode.l10n.t("Active changes"),
       description: `${project.activeChanges.length}`,
       category: "changes",
       project,
     });
     nodes.push({
       kind: "category",
-      label: "Specs activas",
+      label: vscode.l10n.t("Active specs"),
       description: `${project.activeSpecs.length}`,
       category: "specs",
       project,
     });
     nodes.push({
       kind: "category",
-      label: "Archivados",
+      label: vscode.l10n.t("Archived"),
       description: `${project.archivedChanges.length}`,
       category: "archive",
       project,
@@ -235,7 +235,7 @@ export class OpenSpecTreeProvider
     }
     return {
       kind: "tasksGroup",
-      label: "Tareas",
+      label: vscode.l10n.t("Tasks"),
       description,
       artifact: change.artifacts.find((a) => a.kind === "tasks"),
       children: sectionNodes,
@@ -325,7 +325,7 @@ export class OpenSpecTreeProvider
     // Click abre el preview.
     item.command = {
       command: "openspec.preview",
-      title: "Previsualizar",
+      title: "Preview",
       arguments: [node],
     };
     item.tooltip = node.artifact?.fsPath;
@@ -342,7 +342,7 @@ export class OpenSpecTreeProvider
     item.contextValue = "file";
     item.command = {
       command: "openspec.preview",
-      title: "Previsualizar",
+      title: "Preview",
       arguments: [node],
     };
     return item;
@@ -372,10 +372,10 @@ export class OpenSpecTreeProvider
     // Doble clic (detectado en el handler) abre el tasks.md en la línea de la tarea.
     item.command = {
       command: "openspec.taskClick",
-      title: "Ir a la tarea",
+      title: vscode.l10n.t("Go to task"),
       arguments: [node.taskFsPath, node.taskLine],
     };
-    item.tooltip = "Doble clic para abrir el tasks.md en esta tarea";
+    item.tooltip = vscode.l10n.t("Double-click to open tasks.md at this task");
     return item;
   }
 
@@ -389,7 +389,7 @@ export class OpenSpecTreeProvider
     item.contextValue = "file-spec-active";
     item.command = {
       command: "openspec.preview",
-      title: "Previsualizar",
+      title: "Preview",
       arguments: [
         {
           kind: "spec",
@@ -407,7 +407,11 @@ export class OpenSpecTreeProvider
   }
 
   private projectSummary(p: OpenSpecProject): string {
-    return `${p.activeChanges.length} cambios · ${p.activeSpecs.length} specs`;
+    return vscode.l10n.t(
+      "{0} changes · {1} specs",
+      p.activeChanges.length,
+      p.activeSpecs.length
+    );
   }
 }
 

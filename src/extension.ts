@@ -117,7 +117,9 @@ export function activate(context: vscode.ExtensionContext): void {
       terminal.sendText(command, autoRun);
       if (!autoRun) {
         vscode.window.setStatusBarMessage(
-          "OpenSpec: comando listo en la terminal — revisa y pulsa Enter para ejecutar.",
+          vscode.l10n.t(
+            "OpenSpec: command ready in the terminal — review it and press Enter to run."
+          ),
           6000
         );
       }
@@ -135,14 +137,19 @@ export function activate(context: vscode.ExtensionContext): void {
       const pending = stats ? stats.total - stats.done : 0;
       const warn =
         pending > 0
-          ? ` Advertencia: quedan ${pending} tarea(s) pendiente(s).`
+          ? " " + vscode.l10n.t("Warning: {0} task(s) still pending.", pending)
           : "";
+      const archiveLabel = vscode.l10n.t("Archive");
       const choice = await vscode.window.showWarningMessage(
-        `¿Archivar el cambio "${change.id}"?${warn}\n\nSe moverá a changes/archive y se actualizarán las specs principales.`,
+        vscode.l10n.t(
+          'Archive change "{0}"?{1}\n\nIt will be moved to changes/archive and the main specs will be updated.',
+          change.id,
+          warn
+        ),
         { modal: true },
-        "Archivar"
+        archiveLabel
       );
-      if (choice !== "Archivar") {
+      if (choice !== archiveLabel) {
         return;
       }
       const config = vscode.workspace.getConfiguration("openspec");
@@ -168,12 +175,16 @@ export function activate(context: vscode.ExtensionContext): void {
       if (!spec) {
         return;
       }
+      const createLabel = vscode.l10n.t("Create deprecation change");
       const choice = await vscode.window.showWarningMessage(
-        `¿Cerrar la spec "${spec.capability}"?\n\nSe creará un change de deprecación con un delta REMOVED. La spec se eliminará de las specs activas cuando archives ese change (no se borra ahora).`,
+        vscode.l10n.t(
+          'Close spec "{0}"?\n\nA deprecation change will be created with a REMOVED delta. The spec will be removed from the active specs when you archive that change (it is not deleted now).',
+          spec.capability
+        ),
         { modal: true },
-        "Crear change de deprecación"
+        createLabel
       );
-      if (choice !== "Crear change de deprecación") {
+      if (choice !== createLabel) {
         return;
       }
       try {
@@ -183,18 +194,24 @@ export function activate(context: vscode.ExtensionContext): void {
         PreviewPanel.show(
           context.extensionUri,
           {
-            label: "Propuesta",
+            label: vscode.l10n.t("Proposal"),
             kind: "proposal",
             fsPath: result.proposalPath,
           },
           () => treeProvider.refresh()
         );
         vscode.window.showInformationMessage(
-          `Change de deprecación creado: ${result.changeId}. Revísalo y archívalo para retirar la spec.`
+          vscode.l10n.t(
+            "Deprecation change created: {0}. Review it and archive it to retire the spec.",
+            result.changeId
+          )
         );
       } catch (err) {
         vscode.window.showErrorMessage(
-          `No se pudo crear el change de deprecación: ${err instanceof Error ? err.message : String(err)}`
+          vscode.l10n.t(
+            "Could not create the deprecation change: {0}",
+            err instanceof Error ? err.message : String(err)
+          )
         );
       }
     })
@@ -224,7 +241,7 @@ export function activate(context: vscode.ExtensionContext): void {
           lastTaskClick = { key, time: now };
           PreviewPanel.showTask(
             context.extensionUri,
-            { label: "Tareas", kind: "tasks", fsPath },
+            { label: vscode.l10n.t("Tasks"), kind: "tasks", fsPath },
             line,
             () => treeProvider.refresh()
           );

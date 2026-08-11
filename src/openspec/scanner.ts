@@ -71,9 +71,9 @@ function findOpenSpecDirs(root: string, depth: number, acc: string[]): void {
 function readChangeArtifacts(changeDir: string): ArtifactFile[] {
   const artifacts: ArtifactFile[] = [];
   const known: Array<[string, ArtifactFile["kind"], string]> = [
-    ["proposal.md", "proposal", "Propuesta"],
-    ["design.md", "design", "Diseño"],
-    ["tasks.md", "tasks", "Tareas"],
+    ["proposal.md", "proposal", vscode.l10n.t("Proposal")],
+    ["design.md", "design", vscode.l10n.t("Design")],
+    ["tasks.md", "tasks", vscode.l10n.t("Tasks")],
   ];
   for (const [file, kind, label] of known) {
     const full = path.join(changeDir, file);

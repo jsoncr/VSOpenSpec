@@ -17,6 +17,13 @@ A dedicated VS Code extension to preview and navigate [OpenSpec](https://openspe
   - ▶ **Run pending tasks**: appears when a change has incomplete tasks. Opens the integrated terminal in the project folder and writes the configured agent command (Claude Code by default). For safety it is **not executed**: you review and press Enter.
   - 📦 **Archive change**: appears when all tasks are complete (or there are none). Asks for confirmation and runs `openspec archive`.
 
+## Languages
+
+The extension is localized and follows the VS Code display language:
+
+- **English** (default)
+- **Spanish** (`es`) — automatically used when VS Code runs in Spanish.
+
 ## Requirements
 
 - VS Code `^1.84.0`.

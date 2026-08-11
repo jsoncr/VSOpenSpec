@@ -1,7 +1,8 @@
 {
   "name": "openspec-previewer",
   "displayName": "OpenSpec Previewer",
-  "description": "Previsualizador dedicado para proyectos OpenSpec: cambios, tareas (interactivas), specs activas y archivadas.",
+  "description": "%description%",
+  "l10n": "./l10n",
   "version": "0.1.0",
   "publisher": "jcruz",
   "author": "jcruz",
@@ -56,49 +57,49 @@
     "viewsWelcome": [
       {
         "view": "openspecExplorer",
-        "contents": "No se encontró ninguna carpeta 'openspec/' en el workspace.\n\nOpenSpec organiza cambios y specs en una carpeta 'openspec/'. Abre un proyecto que la contenga.\n[Refrescar](command:openspec.refresh)"
+        "contents": "%viewsWelcome.noOpenspec%"
       }
     ],
     "commands": [
       {
         "command": "openspec.refresh",
-        "title": "Refrescar",
+        "title": "%command.refresh.title%",
         "category": "OpenSpec",
         "icon": "$(refresh)"
       },
       {
         "command": "openspec.preview",
-        "title": "Previsualizar",
+        "title": "%command.preview.title%",
         "category": "OpenSpec",
         "icon": "$(open-preview)"
       },
       {
         "command": "openspec.openSource",
-        "title": "Abrir archivo fuente",
+        "title": "%command.openSource.title%",
         "category": "OpenSpec",
         "icon": "$(go-to-file)"
       },
       {
         "command": "openspec.collapseAll",
-        "title": "Colapsar todo",
+        "title": "%command.collapseAll.title%",
         "category": "OpenSpec",
         "icon": "$(collapse-all)"
       },
       {
         "command": "openspec.runTasks",
-        "title": "Ejecutar tareas pendientes",
+        "title": "%command.runTasks.title%",
         "category": "OpenSpec",
         "icon": "$(play)"
       },
       {
         "command": "openspec.archive",
-        "title": "Archivar cambio",
+        "title": "%command.archive.title%",
         "category": "OpenSpec",
         "icon": "$(archive)"
       },
       {
         "command": "openspec.closeSpec",
-        "title": "Cerrar spec (crear change de deprecación)",
+        "title": "%command.closeSpec.title%",
         "category": "OpenSpec",
         "icon": "$(circle-slash)"
       }
@@ -160,17 +161,17 @@
         "openspec.applyCommand": {
           "type": "string",
           "default": "claude \"/openspec:apply ${changeId}\"",
-          "markdownDescription": "Comando para ejecutar las tareas pendientes de un cambio con un agente. Variables disponibles: `${changeId}` (id del cambio) y `${cwd}` (carpeta del proyecto). Se escribe en la terminal integrada."
+          "markdownDescription": "%config.applyCommand.description%"
         },
         "openspec.archiveCommand": {
           "type": "string",
           "default": "openspec archive ${changeId} -y",
-          "markdownDescription": "Comando para archivar un cambio completado. Variables: `${changeId}`, `${cwd}`."
+          "markdownDescription": "%config.archiveCommand.description%"
         },
         "openspec.autoRunApply": {
           "type": "boolean",
           "default": false,
-          "description": "Si está activo, el comando de 'Ejecutar tareas' se envía con salto de línea (se ejecuta al instante). Si está desactivado, solo se escribe en la terminal para que tú lo revises y ejecutes."
+          "description": "%config.autoRunApply.description%"
         }
       }
     }

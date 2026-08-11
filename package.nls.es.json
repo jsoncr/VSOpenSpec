@@ -1,0 +1,14 @@
+{
+  "description": "Previsualizador dedicado para proyectos OpenSpec: cambios, tareas (interactivas), specs activas y archivadas.",
+  "command.refresh.title": "Refrescar",
+  "command.preview.title": "Previsualizar",
+  "command.openSource.title": "Abrir archivo fuente",
+  "command.collapseAll.title": "Colapsar todo",
+  "command.runTasks.title": "Ejecutar tareas pendientes",
+  "command.archive.title": "Archivar cambio",
+  "command.closeSpec.title": "Cerrar spec (crear change de deprecación)",
+  "viewsWelcome.noOpenspec": "No se encontró ninguna carpeta 'openspec/' en el workspace.\n\nOpenSpec organiza cambios y specs en una carpeta 'openspec/'. Abre un proyecto que la contenga.\n[Refrescar](command:openspec.refresh)",
+  "config.applyCommand.description": "Comando para ejecutar las tareas pendientes de un cambio con un agente. Variables disponibles: `${changeId}` (id del cambio) y `${cwd}` (carpeta del proyecto). Se escribe en la terminal integrada.",
+  "config.archiveCommand.description": "Comando para archivar un cambio completado. Variables: `${changeId}`, `${cwd}`.",
+  "config.autoRunApply.description": "Si está activo, el comando de 'Ejecutar tareas' se envía con salto de línea (se ejecuta al instante). Si está desactivado, solo se escribe en la terminal para que tú lo revises y ejecutes."
+}

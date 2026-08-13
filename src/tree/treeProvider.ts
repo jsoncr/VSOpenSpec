@@ -8,6 +8,10 @@ import {
 } from "../openspec/model";
 import { readTasks } from "../openspec/tasks";
 import { scanWorkspace } from "../openspec/scanner";
+import { validateChange, ValidationResult } from "../openspec/validate";
+
+/** Filtro aplicado a la lista de cambios activos. */
+export type ChangeFilter = "all" | "pending" | "completed";
 
 /** Tipos de nodo que puede contener el árbol. */
 type NodeKind =
@@ -49,6 +53,18 @@ export class OpenSpecTreeProvider
   readonly onDidChangeTreeData = this._onDidChangeTreeData.event;
 
   private projects: OpenSpecProject[] = [];
+  /** Resultados de validación por dirPath del cambio. */
+  private validation = new Map<string, ValidationResult>();
+  /** Filtro actual de cambios activos. */
+  private filter: ChangeFilter = "all";
+  /** Texto de búsqueda (subcadena en el id del cambio). */
+  private query = "";
+
+  /** Callback opcional para volcar los issues a diagnósticos (Problems). */
+  onValidated?: (
+    results: Map<string, ValidationResult>,
+    changes: Change[]
+  ) => void;
 
   refresh(): void {
     this.projects = scanWorkspace();
@@ -59,10 +75,67 @@ export class OpenSpecTreeProvider
       this.projects.length > 0
     );
     this._onDidChangeTreeData.fire();
+    void this.runValidationPass();
   }
 
   getProjects(): OpenSpecProject[] {
     return this.projects;
+  }
+
+  setFilter(filter: ChangeFilter): void {
+    this.filter = filter;
+    vscode.commands.executeCommand("setContext", "openspec.filter", filter);
+    this._onDidChangeTreeData.fire();
+  }
+
+  getFilter(): ChangeFilter {
+    return this.filter;
+  }
+
+  setQuery(query: string): void {
+    this.query = query.trim().toLowerCase();
+    this._onDidChangeTreeData.fire();
+  }
+
+  /** Aplica filtro y búsqueda a una lista de cambios activos. */
+  private applyFilter(changes: Change[]): Change[] {
+    return changes.filter((c) => {
+      if (this.query && !c.id.toLowerCase().includes(this.query)) {
+        return false;
+      }
+      const stats = c.taskStats;
+      const complete = !!stats && stats.total > 0 && stats.done === stats.total;
+      if (this.filter === "pending") {
+        return !complete;
+      }
+      if (this.filter === "completed") {
+        return complete;
+      }
+      return true;
+    });
+  }
+
+  /** Valida todos los cambios activos y refresca el árbol al terminar. */
+  private async runValidationPass(): Promise<void> {
+    const changes: Change[] = [];
+    for (const p of this.projects) {
+      changes.push(...p.activeChanges);
+    }
+    let anyChange = false;
+    for (const change of changes) {
+      const result = await validateChange(change);
+      const prev = this.validation.get(change.dirPath);
+      if (!prev || prev.status !== result.status) {
+        anyChange = true;
+      }
+      this.validation.set(change.dirPath, result);
+    }
+    if (this.onValidated) {
+      this.onValidated(this.validation, changes);
+    }
+    if (anyChange) {
+      this._onDidChangeTreeData.fire();
+    }
   }
 
   getTreeItem(node: OSNode): vscode.TreeItem {
@@ -164,7 +237,9 @@ export class OpenSpecTreeProvider
   private categoryChildren(node: OSNode): OSNode[] {
     const project = node.project!;
     if (node.category === "changes") {
-      return project.activeChanges.map((c) => this.changeNode(c));
+      return this.applyFilter(project.activeChanges).map((c) =>
+        this.changeNode(c)
+      );
     }
     if (node.category === "archive") {
       return project.archivedChanges.map((c) => this.changeNode(c));
@@ -295,14 +370,27 @@ export class OpenSpecTreeProvider
       item.contextValue = "change-archivable";
     }
 
-    item.iconPath = new vscode.ThemeIcon(
-      allDone || (!hasTasks && !change.archived)
-        ? "pass-filled"
-        : change.archived
-          ? "archive"
-          : "circle-large-outline"
-    );
-    item.tooltip = change.dirPath;
+    // Estado de validación: si es inválido, prima el icono de advertencia.
+    const validation = this.validation.get(change.dirPath);
+    if (!change.archived && validation?.status === "invalid") {
+      item.iconPath = new vscode.ThemeIcon(
+        "warning",
+        new vscode.ThemeColor("list.warningForeground")
+      );
+      item.tooltip = new vscode.MarkdownString(
+        `**${vscode.l10n.t("Invalid change")}**\n\n` +
+          validation.messages.map((m) => `- ${m}`).join("\n")
+      );
+    } else {
+      item.iconPath = new vscode.ThemeIcon(
+        allDone || (!hasTasks && !change.archived)
+          ? "pass-filled"
+          : change.archived
+            ? "archive"
+            : "circle-large-outline"
+      );
+      item.tooltip = change.dirPath;
+    }
     return item;
   }
 
@@ -321,7 +409,9 @@ export class OpenSpecTreeProvider
     item.iconPath = new vscode.ThemeIcon(
       iconMap[node.artifact?.kind ?? "generic"]
     );
-    item.contextValue = "file";
+    // Los spec deltas llevan un contextValue propio para habilitar "Ver impacto".
+    item.contextValue =
+      node.artifact?.kind === "spec" ? "file-spec-delta" : "file";
     // Click abre el preview.
     item.command = {
       command: "openspec.preview",

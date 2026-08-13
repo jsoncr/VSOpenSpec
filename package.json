@@ -3,7 +3,7 @@
   "displayName": "OpenSpec Viewer",
   "description": "%description%",
   "l10n": "./l10n",
-  "version": "0.2.0",
+  "version": "0.4.1",
   "publisher": "jcruz",
   "author": "jcruz",
   "license": "MIT",
@@ -57,7 +57,13 @@
     "viewsWelcome": [
       {
         "view": "openspecExplorer",
-        "contents": "%viewsWelcome.noOpenspec%"
+        "contents": "%viewsWelcome.init%",
+        "when": "openspec.cliAvailable"
+      },
+      {
+        "view": "openspecExplorer",
+        "contents": "%viewsWelcome.install%",
+        "when": "!openspec.cliAvailable"
       }
     ],
     "commands": [
@@ -114,29 +120,74 @@
         "title": "%command.openDashboard.title%",
         "category": "OpenSpec",
         "icon": "$(graph)"
+      },
+      {
+        "command": "openspec.showDelta",
+        "title": "%command.showDelta.title%",
+        "category": "OpenSpec",
+        "icon": "$(diff)"
+      },
+      {
+        "command": "openspec.filter",
+        "title": "%command.filter.title%",
+        "category": "OpenSpec",
+        "icon": "$(filter)"
+      },
+      {
+        "command": "openspec.search",
+        "title": "%command.search.title%",
+        "category": "OpenSpec",
+        "icon": "$(search)"
+      },
+      {
+        "command": "openspec.init",
+        "title": "%command.init.title%",
+        "category": "OpenSpec",
+        "icon": "$(cloud-download)"
+      },
+      {
+        "command": "openspec.install",
+        "title": "%command.install.title%",
+        "category": "OpenSpec",
+        "icon": "$(desktop-download)"
       }
     ],
     "menus": {
       "view/title": [
         {
+          "command": "openspec.init",
+          "when": "view == openspecExplorer && !openspec.hasProjects",
+          "group": "navigation@0"
+        },
+        {
           "command": "openspec.createProposal",
-          "when": "view == openspecExplorer",
+          "when": "view == openspecExplorer && openspec.hasProjects",
           "group": "navigation@0"
         },
         {
           "command": "openspec.openDashboard",
-          "when": "view == openspecExplorer",
+          "when": "view == openspecExplorer && openspec.hasProjects",
           "group": "navigation@1"
+        },
+        {
+          "command": "openspec.search",
+          "when": "view == openspecExplorer && openspec.hasProjects",
+          "group": "navigation@2"
+        },
+        {
+          "command": "openspec.filter",
+          "when": "view == openspecExplorer && openspec.hasProjects",
+          "group": "navigation@3"
         },
         {
           "command": "openspec.refresh",
           "when": "view == openspecExplorer",
-          "group": "navigation@2"
+          "group": "navigation@4"
         },
         {
           "command": "openspec.collapseAll",
-          "when": "view == openspecExplorer",
-          "group": "navigation@3"
+          "when": "view == openspecExplorer && openspec.hasProjects",
+          "group": "navigation@5"
         }
       ],
       "view/item/context": [
@@ -163,6 +214,11 @@
         {
           "command": "openspec.closeSpec",
           "when": "view == openspecExplorer && viewItem == file-spec-active",
+          "group": "inline@0"
+        },
+        {
+          "command": "openspec.showDelta",
+          "when": "view == openspecExplorer && viewItem == file-spec-delta",
           "group": "inline@0"
         },
         {

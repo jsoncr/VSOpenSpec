@@ -26,6 +26,12 @@ Per-change inline actions (run pending tasks / archive), active specs and archiv
 - **Per-change actions** (inline buttons):
   - ▶ **Run pending tasks**: appears when a change has incomplete tasks. Opens the integrated terminal in the project folder and writes the configured agent command (Claude Code by default). For safety it is **not executed**: you review and press Enter.
   - 📦 **Archive change**: appears when all tasks are complete (or there are none). Asks for confirmation and runs `openspec archive`.
+- **New proposal** (➕ in the view toolbar): asks for the requirement/change description and launches the configured agent (`openspec.proposalCommand`).
+- **Validation** (`openspec validate`): active changes are validated in the background; invalid ones show a ⚠️ icon with the messages in the tooltip and clickable entries in the **Problems** panel.
+- **Show impact** (diff): on a spec delta, opens a native diff of the delta against the current active spec — review the intent without reading code.
+- **Filter & search**: filter active changes (all / only pending / only completed) and search by id from the view toolbar.
+- **Initialize OpenSpec**: when no `openspec/` is found, the welcome view offers a button that runs `openspec init`.
+- **Dashboard** (📊 in the view toolbar): a full analytics page with charts — KPIs, completion donut, progress distribution, **linear progress map** (colored by progress), **velocity** (tasks completed per week), per-change bars, monthly bars and a timeline table; with **Active / Archived** tabs.
 
 ## Languages
 

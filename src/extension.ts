@@ -8,6 +8,9 @@ import { Change, OpenSpecProject } from "./openspec/model";
 import { createDeprecationChange } from "./openspec/deprecate";
 import { DashboardPanel } from "./dashboard/dashboardPanel";
 import { computeAnalytics } from "./dashboard/analytics";
+import { activeSpecPathForDelta, capabilityOf } from "./openspec/paths";
+import * as fs from "fs";
+import { execFile } from "child_process";
 
 /** Carpeta del proyecto = carpeta que contiene openspec/ (padre de rootPath). */
 function projectCwdOf(project: OpenSpecProject): string {
@@ -87,6 +90,56 @@ export function activate(context: vscode.ExtensionContext): void {
     manageCheckboxStateManually: true,
   });
   context.subscriptions.push(treeView);
+
+  // Colección de diagnósticos para volcar los issues de validación al panel Problemas.
+  const diagnostics = vscode.languages.createDiagnosticCollection("openspec");
+  context.subscriptions.push(diagnostics);
+  treeProvider.onValidated = (results, changes) => {
+    diagnostics.clear();
+    for (const change of changes) {
+      const result = results.get(change.dirPath);
+      if (!result || result.status !== "invalid") {
+        continue;
+      }
+      // Agrupa issues por archivo (delta specs/<cap>/spec.md dentro del cambio).
+      const byFile = new Map<string, vscode.Diagnostic[]>();
+      for (const issue of result.issues) {
+        const rel = issue.path ?? "";
+        const target = rel
+          ? path.join(change.dirPath, "specs", rel)
+          : path.join(change.dirPath, "proposal.md");
+        const sev =
+          (issue.level ?? "ERROR").toUpperCase() === "ERROR"
+            ? vscode.DiagnosticSeverity.Error
+            : vscode.DiagnosticSeverity.Warning;
+        const diag = new vscode.Diagnostic(
+          new vscode.Range(0, 0, 0, 1),
+          issue.message ?? vscode.l10n.t("Validation issue"),
+          sev
+        );
+        diag.source = "openspec";
+        const arr = byFile.get(target) ?? [];
+        arr.push(diag);
+        byFile.set(target, arr);
+      }
+      for (const [file, diags] of byFile) {
+        diagnostics.set(vscode.Uri.file(file), diags);
+      }
+    }
+  };
+
+  // Detecta si la CLI de OpenSpec está disponible, para mostrar el botón correcto
+  // en la vista de bienvenida (Inicializar vs Instalar).
+  const detectCli = () => {
+    execFile("openspec", ["--version"], { timeout: 5000 }, (error) => {
+      vscode.commands.executeCommand(
+        "setContext",
+        "openspec.cliAvailable",
+        !error
+      );
+    });
+  };
+  detectCli();
 
   // Primer escaneo.
   treeProvider.refresh();
@@ -247,6 +300,127 @@ export function activate(context: vscode.ExtensionContext): void {
             "Could not create the deprecation change: {0}",
             err instanceof Error ? err.message : String(err)
           )
+        );
+      }
+    })
+  );
+
+  // Instalar la CLI de OpenSpec globalmente (npm). Escribe el comando en la terminal.
+  context.subscriptions.push(
+    vscode.commands.registerCommand("openspec.install", () => {
+      const folders = vscode.workspace.workspaceFolders ?? [];
+      const cwd = folders[0]?.uri.fsPath;
+      const terminal = getOpenSpecTerminal(cwd ?? process.cwd());
+      terminal.show();
+      // Escribimos el comando; el usuario lo ejecuta con Enter.
+      terminal.sendText("npm install -g @fission-ai/openspec@latest", false);
+      vscode.window.setStatusBarMessage(
+        vscode.l10n.t(
+          "OpenSpec: install command ready in the terminal — press Enter to run it."
+        ),
+        6000
+      );
+    })
+  );
+
+  // Inicializar OpenSpec en una carpeta del workspace que aún no lo tenga.
+  context.subscriptions.push(
+    vscode.commands.registerCommand("openspec.init", async () => {
+      const folders = vscode.workspace.workspaceFolders ?? [];
+      if (folders.length === 0) {
+        vscode.window.showWarningMessage(
+          vscode.l10n.t("Open a folder first to initialize OpenSpec.")
+        );
+        return;
+      }
+      let cwd = folders[0].uri.fsPath;
+      if (folders.length > 1) {
+        const pick = await vscode.window.showQuickPick(
+          folders.map((f) => ({ label: f.name, description: f.uri.fsPath })),
+          { placeHolder: vscode.l10n.t("Select the folder to initialize") }
+        );
+        if (!pick) {
+          return;
+        }
+        cwd = pick.description;
+      }
+      const terminal = getOpenSpecTerminal(cwd);
+      terminal.show();
+      terminal.sendText(`cd "${cwd}"`, true);
+      // Escribimos el comando; el usuario revisa el wizard y ejecuta con Enter.
+      terminal.sendText("openspec init", false);
+      vscode.window.setStatusBarMessage(
+        vscode.l10n.t(
+          "OpenSpec: 'openspec init' is ready in the terminal — press Enter to run the wizard."
+        ),
+        6000
+      );
+    })
+  );
+
+  // Filtro de cambios activos: todos / solo pendientes / solo completos.
+  context.subscriptions.push(
+    vscode.commands.registerCommand("openspec.filter", async () => {
+      const options: Array<{ label: string; value: "all" | "pending" | "completed" }> = [
+        { label: vscode.l10n.t("All changes"), value: "all" },
+        { label: vscode.l10n.t("Only pending"), value: "pending" },
+        { label: vscode.l10n.t("Only completed"), value: "completed" },
+      ];
+      const pick = await vscode.window.showQuickPick(
+        options.map((o) => o.label),
+        { placeHolder: vscode.l10n.t("Filter active changes") }
+      );
+      const found = options.find((o) => o.label === pick);
+      if (found) {
+        treeProvider.setFilter(found.value);
+      }
+    })
+  );
+
+  // Búsqueda por texto en el id del cambio.
+  context.subscriptions.push(
+    vscode.commands.registerCommand("openspec.search", async () => {
+      const query = await vscode.window.showInputBox({
+        title: vscode.l10n.t("Search changes"),
+        prompt: vscode.l10n.t("Type to filter changes by id (empty to clear)"),
+        value: treeProvider.getFilter() === "all" ? "" : undefined,
+      });
+      // undefined = cancelado; string vacío = limpiar.
+      if (query !== undefined) {
+        treeProvider.setQuery(query);
+      }
+    })
+  );
+
+  // Ver impacto: diff del spec delta contra la spec activa correspondiente.
+  context.subscriptions.push(
+    vscode.commands.registerCommand("openspec.showDelta", (node: OSNode) => {
+      const delta = node?.artifact;
+      if (!delta || delta.kind !== "spec") {
+        return;
+      }
+      const cap = capabilityOf(delta.fsPath);
+      const activePath = activeSpecPathForDelta(delta.fsPath);
+      const deltaUri = vscode.Uri.file(delta.fsPath);
+
+      if (activePath && fs.existsSync(activePath)) {
+        // Izquierda: spec activa vigente. Derecha: delta propuesto.
+        vscode.commands.executeCommand(
+          "vscode.diff",
+          vscode.Uri.file(activePath),
+          deltaUri,
+          vscode.l10n.t("{0}: active spec ↔ delta", cap)
+        );
+      } else {
+        // No hay spec activa aún (capability nueva): mostramos el delta y avisamos.
+        vscode.window.showInformationMessage(
+          vscode.l10n.t(
+            "No active spec exists yet for \"{0}\" (it will be created when the change is archived). Showing the proposed delta.",
+            cap
+          )
+        );
+        PreviewPanel.show(context.extensionUri, delta, () =>
+          treeProvider.refresh()
         );
       }
     })

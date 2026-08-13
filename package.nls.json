@@ -7,8 +7,11 @@
   "command.runTasks.title": "Run pending tasks",
   "command.archive.title": "Archive change",
   "command.closeSpec.title": "Close spec (create deprecation change)",
+  "command.createProposal.title": "New proposal",
+  "command.openDashboard.title": "Open dashboard",
   "viewsWelcome.noOpenspec": "No 'openspec/' folder was found in the workspace.\n\nOpenSpec organizes changes and specs inside an 'openspec/' folder. Open a project that contains one.\n[Refresh](command:openspec.refresh)",
   "config.applyCommand.description": "Command used to run a change's pending tasks with an agent. Available variables: `${changeId}` (change id) and `${cwd}` (project folder). It is written to the integrated terminal.",
   "config.archiveCommand.description": "Command used to archive a completed change. Variables: `${changeId}`, `${cwd}`.",
-  "config.autoRunApply.description": "When enabled, the 'Run tasks' command is sent with a trailing newline (runs instantly). When disabled, it is only written to the terminal so you can review and run it yourself."
+  "config.autoRunApply.description": "When enabled, the 'Run tasks' command is sent with a trailing newline (runs instantly). When disabled, it is only written to the terminal so you can review and run it yourself.",
+  "config.proposalCommand.description": "Command used to create a new proposal with an agent. Variables: `${description}` (the requirement/change description you type) and `${cwd}` (project folder). It is written to the integrated terminal."
 }

@@ -4,8 +4,43 @@ import * as vscode from "vscode";
 import { OpenSpecTreeProvider, OSNode } from "./tree/treeProvider";
 import { PreviewPanel } from "./preview/previewPanel";
 import { toggleTaskLine } from "./openspec/tasks";
-import { Change } from "./openspec/model";
+import { Change, OpenSpecProject } from "./openspec/model";
 import { createDeprecationChange } from "./openspec/deprecate";
+import { DashboardPanel } from "./dashboard/dashboardPanel";
+import { computeAnalytics } from "./dashboard/analytics";
+
+/** Carpeta del proyecto = carpeta que contiene openspec/ (padre de rootPath). */
+function projectCwdOf(project: OpenSpecProject): string {
+  return path.dirname(project.rootPath);
+}
+
+/** Elige la carpeta de proyecto: única directa, o QuickPick si hay varias. */
+async function pickProjectCwd(
+  projects: OpenSpecProject[]
+): Promise<string | undefined> {
+  if (projects.length === 0) {
+    vscode.window.showWarningMessage(
+      vscode.l10n.t("No OpenSpec project was found in the workspace.")
+    );
+    return undefined;
+  }
+  if (projects.length === 1) {
+    return projectCwdOf(projects[0]);
+  }
+  const items = projects.map((p) => ({
+    label: p.name,
+    description: projectCwdOf(p),
+  }));
+  const pick = await vscode.window.showQuickPick(items, {
+    placeHolder: vscode.l10n.t("Select the OpenSpec project"),
+  });
+  return pick?.description;
+}
+
+/** Sanitiza el texto para inyectarlo dentro de comillas dobles en la terminal. */
+function sanitizeForShell(text: string): string {
+  return text.replace(/\r?\n/g, " ").replace(/"/g, '\\"').trim();
+}
 
 /** Deriva la carpeta del proyecto (padre de openspec/) a partir de la ruta de un cambio. */
 function resolveProjectCwd(change: Change): string {
@@ -217,6 +252,63 @@ export function activate(context: vscode.ExtensionContext): void {
     })
   );
 
+  // Abrir el dashboard de análisis (stats y gráficos).
+  context.subscriptions.push(
+    vscode.commands.registerCommand("openspec.openDashboard", () => {
+      DashboardPanel.show(() =>
+        computeAnalytics(treeProvider.getProjects(), Date.now())
+      );
+    })
+  );
+
+  // Crear una nueva proposal: pide la descripción del requerimiento/cambio y
+  // lanza el agente configurado (por defecto Claude Code) en la terminal.
+  context.subscriptions.push(
+    vscode.commands.registerCommand("openspec.createProposal", async () => {
+      const cwd = await pickProjectCwd(treeProvider.getProjects());
+      if (!cwd) {
+        return;
+      }
+      const description = await vscode.window.showInputBox({
+        title: vscode.l10n.t("New OpenSpec proposal"),
+        prompt: vscode.l10n.t("Describe the requirement or change"),
+        placeHolder: vscode.l10n.t(
+          "e.g. Add email notifications when a task is completed"
+        ),
+        ignoreFocusOut: true,
+        validateInput: (v) =>
+          v.trim().length < 5
+            ? vscode.l10n.t("Please enter a longer description.")
+            : undefined,
+      });
+      if (!description) {
+        return;
+      }
+      const config = vscode.workspace.getConfiguration("openspec");
+      const template = config.get<string>(
+        "proposalCommand",
+        'claude "/openspec:proposal ${description}"'
+      );
+      const autoRun = config.get<boolean>("autoRunApply", false);
+      const command = template
+        .replace(/\$\{description\}/g, sanitizeForShell(description))
+        .replace(/\$\{cwd\}/g, cwd);
+
+      const terminal = getOpenSpecTerminal(cwd);
+      terminal.show();
+      terminal.sendText(`cd "${cwd}"`, true);
+      terminal.sendText(command, autoRun);
+      if (!autoRun) {
+        vscode.window.setStatusBarMessage(
+          vscode.l10n.t(
+            "OpenSpec: command ready in the terminal — review it and press Enter to run."
+          ),
+          6000
+        );
+      }
+    })
+  );
+
   // Doble clic en una subtarea del árbol: detección manual por tiempo entre clics.
   let lastTaskClick: { key: string; time: number } | undefined;
   context.subscriptions.push(
@@ -291,6 +383,7 @@ export function activate(context: vscode.ExtensionContext): void {
   const onChange = () => {
     treeProvider.refresh();
     PreviewPanel.refreshCurrent();
+    DashboardPanel.refreshCurrent();
   };
   watcher.onDidChange(onChange);
   watcher.onDidCreate(onChange);

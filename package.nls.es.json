@@ -7,8 +7,11 @@
   "command.runTasks.title": "Ejecutar tareas pendientes",
   "command.archive.title": "Archivar cambio",
   "command.closeSpec.title": "Cerrar spec (crear change de deprecación)",
+  "command.createProposal.title": "Nueva proposal",
+  "command.openDashboard.title": "Abrir dashboard",
   "viewsWelcome.noOpenspec": "No se encontró ninguna carpeta 'openspec/' en el workspace.\n\nOpenSpec organiza cambios y specs en una carpeta 'openspec/'. Abre un proyecto que la contenga.\n[Refrescar](command:openspec.refresh)",
   "config.applyCommand.description": "Comando para ejecutar las tareas pendientes de un cambio con un agente. Variables disponibles: `${changeId}` (id del cambio) y `${cwd}` (carpeta del proyecto). Se escribe en la terminal integrada.",
   "config.archiveCommand.description": "Comando para archivar un cambio completado. Variables: `${changeId}`, `${cwd}`.",
-  "config.autoRunApply.description": "Si está activo, el comando de 'Ejecutar tareas' se envía con salto de línea (se ejecuta al instante). Si está desactivado, solo se escribe en la terminal para que tú lo revises y ejecutes."
+  "config.autoRunApply.description": "Si está activo, el comando de 'Ejecutar tareas' se envía con salto de línea (se ejecuta al instante). Si está desactivado, solo se escribe en la terminal para que tú lo revises y ejecutes.",
+  "config.proposalCommand.description": "Comando para crear una nueva proposal con un agente. Variables: `${description}` (la descripción del requerimiento/cambio que escribes) y `${cwd}` (carpeta del proyecto). Se escribe en la terminal integrada."
 }

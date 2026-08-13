@@ -48,6 +48,12 @@ export interface Change {
   tasksPath?: string;
   /** Progreso de tareas (undefined si no hay tasks.md). */
   taskStats?: TaskStats;
+  /** Fecha de creación (ms epoch): campo `created` de .openspec.yaml o birthtime del dir. */
+  createdAt?: number;
+  /** Última modificación (ms epoch): mtime más reciente entre sus artefactos. */
+  updatedAt?: number;
+  /** Fecha de archivado (ms epoch): mtime de la carpeta al moverse a archive/. */
+  archivedAt?: number;
 }
 
 /** Una spec activa (openspec/specs/<capability>/spec.md). */

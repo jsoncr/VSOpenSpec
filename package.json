@@ -1,6 +1,6 @@
 {
-  "name": "openspec-previewer",
-  "displayName": "OpenSpec Previewer",
+  "name": "openspec-viewer",
+  "displayName": "OpenSpec Viewer",
   "description": "%description%",
   "l10n": "./l10n",
   "version": "0.2.0",
@@ -102,19 +102,41 @@
         "title": "%command.closeSpec.title%",
         "category": "OpenSpec",
         "icon": "$(circle-slash)"
+      },
+      {
+        "command": "openspec.createProposal",
+        "title": "%command.createProposal.title%",
+        "category": "OpenSpec",
+        "icon": "$(add)"
+      },
+      {
+        "command": "openspec.openDashboard",
+        "title": "%command.openDashboard.title%",
+        "category": "OpenSpec",
+        "icon": "$(graph)"
       }
     ],
     "menus": {
       "view/title": [
         {
-          "command": "openspec.refresh",
+          "command": "openspec.createProposal",
+          "when": "view == openspecExplorer",
+          "group": "navigation@0"
+        },
+        {
+          "command": "openspec.openDashboard",
           "when": "view == openspecExplorer",
           "group": "navigation@1"
         },
         {
-          "command": "openspec.collapseAll",
+          "command": "openspec.refresh",
           "when": "view == openspecExplorer",
           "group": "navigation@2"
+        },
+        {
+          "command": "openspec.collapseAll",
+          "when": "view == openspecExplorer",
+          "group": "navigation@3"
         }
       ],
       "view/item/context": [
@@ -167,6 +189,11 @@
           "type": "string",
           "default": "openspec archive ${changeId} -y",
           "markdownDescription": "%config.archiveCommand.description%"
+        },
+        "openspec.proposalCommand": {
+          "type": "string",
+          "default": "claude \"/openspec:proposal ${description}\"",
+          "markdownDescription": "%config.proposalCommand.description%"
         },
         "openspec.autoRunApply": {
           "type": "boolean",

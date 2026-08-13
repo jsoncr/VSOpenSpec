@@ -100,6 +100,43 @@ function readSpecDeltas(changeDir: string): ArtifactFile[] {
   return deltas;
 }
 
+/** Devuelve el mtime (ms) de un archivo/carpeta, o undefined si no existe. */
+function mtimeMs(p: string): number | undefined {
+  try {
+    return fs.statSync(p).mtimeMs;
+  } catch {
+    return undefined;
+  }
+}
+
+/** Devuelve la fecha de creación (ms) de una carpeta (birthtime, con fallback a ctime). */
+function dirBirthtimeMs(p: string): number | undefined {
+  try {
+    const s = fs.statSync(p);
+    return s.birthtimeMs || s.ctimeMs;
+  } catch {
+    return undefined;
+  }
+}
+
+/** Lee el campo `created: YYYY-MM-DD` de .openspec.yaml y lo convierte a ms epoch. */
+function readCreatedFromYaml(changeDir: string): number | undefined {
+  try {
+    const yaml = fs.readFileSync(path.join(changeDir, ".openspec.yaml"), "utf8");
+    const m = yaml.match(/^\s*created:\s*['"]?(\d{4})-(\d{2})-(\d{2})/m);
+    if (m) {
+      // Construimos la fecha en horario LOCAL (no UTC) para que coincida con el
+      // formateo local del dashboard y no se corra un día en zonas UTC-negativas.
+      const [, y, mo, d] = m;
+      const t = new Date(Number(y), Number(mo) - 1, Number(d)).getTime();
+      return Number.isNaN(t) ? undefined : t;
+    }
+  } catch {
+    // sin .openspec.yaml o sin campo created
+  }
+  return undefined;
+}
+
 /** Parsea un único cambio a partir de su carpeta. */
 function readChange(changeDir: string, archived: boolean): Change {
   const artifacts = readChangeArtifacts(changeDir);
@@ -118,6 +155,21 @@ function readChange(changeDir: string, archived: boolean): Change {
     change.tasksPath = tasksArtifact.fsPath;
     change.taskStats = computeStats(readTasks(tasksArtifact.fsPath));
   }
+
+  // Metadatos de tiempo para el dashboard.
+  const files = [...artifacts, ...specDeltas].map((a) => a.fsPath);
+  files.push(path.join(changeDir, ".openspec.yaml"));
+  let updatedAt: number | undefined;
+  for (const f of files) {
+    const m = mtimeMs(f);
+    if (m !== undefined) {
+      updatedAt = updatedAt === undefined ? m : Math.max(updatedAt, m);
+    }
+  }
+  change.updatedAt = updatedAt;
+  change.createdAt = readCreatedFromYaml(changeDir) ?? dirBirthtimeMs(changeDir);
+  // Al archivar, la carpeta se mueve: su mtime aproxima la fecha de archivado.
+  change.archivedAt = archived ? mtimeMs(changeDir) : undefined;
 
   return change;
 }

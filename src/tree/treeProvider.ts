@@ -42,6 +42,8 @@ export interface OSNode {
   taskDone?: boolean;
   /** Hijos precalculados (secciones/tareas). */
   children?: OSNode[];
+  /** Para la categoría de cambios: true si hay filtro/búsqueda activos. */
+  filterActive?: boolean;
 }
 
 export class OpenSpecTreeProvider
@@ -92,8 +94,20 @@ export class OpenSpecTreeProvider
     return this.filter;
   }
 
+  getQuery(): string {
+    return this.query;
+  }
+
   setQuery(query: string): void {
     this.query = query.trim().toLowerCase();
+    this._onDidChangeTreeData.fire();
+  }
+
+  /** Restaura filtro y búsqueda a su estado inicial. */
+  clearFilter(): void {
+    this.filter = "all";
+    this.query = "";
+    vscode.commands.executeCommand("setContext", "openspec.filter", "all");
     this._onDidChangeTreeData.fire();
   }
 
@@ -210,12 +224,26 @@ export class OpenSpecTreeProvider
         },
       });
     }
+    // Refleja el estado de filtro/búsqueda en la categoría de cambios activos.
+    const filtered = this.applyFilter(project.activeChanges).length;
+    const total = project.activeChanges.length;
+    const active = this.filter !== "all" || this.query.length > 0;
+    let changesDesc = active ? `${filtered}/${total}` : `${total}`;
+    const badges: string[] = [];
+    if (this.filter === "pending") badges.push(vscode.l10n.t("pending"));
+    if (this.filter === "completed") badges.push(vscode.l10n.t("completed"));
+    if (this.query) badges.push(`"${this.query}"`);
+    if (badges.length > 0) {
+      changesDesc += ` · ${badges.join(" · ")}`;
+    }
     nodes.push({
       kind: "category",
       label: vscode.l10n.t("Active changes"),
-      description: `${project.activeChanges.length}`,
+      description: changesDesc,
       category: "changes",
       project,
+      // contextValue con sufijo para mostrar el botón "limpiar filtro" cuando aplica.
+      filterActive: active,
     });
     nodes.push({
       kind: "category",
@@ -343,7 +371,11 @@ export class OpenSpecTreeProvider
     const item = new vscode.TreeItem(node.label, collapsed);
     item.description = node.description;
     item.iconPath = new vscode.ThemeIcon(iconMap[node.category ?? "changes"]);
-    item.contextValue = `category-${node.category}`;
+    // Sufijo -filtered para mostrar el botón inline "limpiar filtro".
+    item.contextValue =
+      node.category === "changes" && node.filterActive
+        ? "category-changes-filtered"
+        : `category-${node.category}`;
     return item;
   }
 

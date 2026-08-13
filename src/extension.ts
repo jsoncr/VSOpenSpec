@@ -153,14 +153,6 @@ export function activate(context: vscode.ExtensionContext): void {
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand("openspec.collapseAll", () => {
-      vscode.commands.executeCommand(
-        "workbench.actions.treeView.openspecExplorer.collapseAll"
-      );
-    })
-  );
-
-  context.subscriptions.push(
     vscode.commands.registerCommand("openspec.preview", (node: OSNode) => {
       if (node?.artifact) {
         PreviewPanel.show(context.extensionUri, node.artifact, () =>
@@ -383,12 +375,19 @@ export function activate(context: vscode.ExtensionContext): void {
       const query = await vscode.window.showInputBox({
         title: vscode.l10n.t("Search changes"),
         prompt: vscode.l10n.t("Type to filter changes by id (empty to clear)"),
-        value: treeProvider.getFilter() === "all" ? "" : undefined,
+        value: treeProvider.getQuery(),
       });
       // undefined = cancelado; string vacío = limpiar.
       if (query !== undefined) {
         treeProvider.setQuery(query);
       }
+    })
+  );
+
+  // Limpiar filtro y búsqueda.
+  context.subscriptions.push(
+    vscode.commands.registerCommand("openspec.clearFilter", () => {
+      treeProvider.clearFilter();
     })
   );
 

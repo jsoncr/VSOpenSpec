@@ -64,6 +64,8 @@
   "All changes": "Todos los cambios",
   "Only pending": "Solo pendientes",
   "Only completed": "Solo completos",
+  "pending": "pendientes",
+  "completed": "completos",
   "Filter active changes": "Filtrar cambios activos",
   "Search changes": "Buscar cambios",
   "Type to filter changes by id (empty to clear)": "Escribe para filtrar cambios por id (vacío para limpiar)",

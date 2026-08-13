@@ -3,7 +3,7 @@
   "displayName": "OpenSpec Viewer",
   "description": "%description%",
   "l10n": "./l10n",
-  "version": "0.4.1",
+  "version": "0.4.5",
   "publisher": "jcruz",
   "author": "jcruz",
   "license": "MIT",
@@ -86,12 +86,6 @@
         "icon": "$(go-to-file)"
       },
       {
-        "command": "openspec.collapseAll",
-        "title": "%command.collapseAll.title%",
-        "category": "OpenSpec",
-        "icon": "$(collapse-all)"
-      },
-      {
         "command": "openspec.runTasks",
         "title": "%command.runTasks.title%",
         "category": "OpenSpec",
@@ -150,6 +144,12 @@
         "title": "%command.install.title%",
         "category": "OpenSpec",
         "icon": "$(desktop-download)"
+      },
+      {
+        "command": "openspec.clearFilter",
+        "title": "%command.clearFilter.title%",
+        "category": "OpenSpec",
+        "icon": "$(clear-all)"
       }
     ],
     "menus": {
@@ -183,14 +183,14 @@
           "command": "openspec.refresh",
           "when": "view == openspecExplorer",
           "group": "navigation@4"
-        },
-        {
-          "command": "openspec.collapseAll",
-          "when": "view == openspecExplorer && openspec.hasProjects",
-          "group": "navigation@5"
         }
       ],
       "view/item/context": [
+        {
+          "command": "openspec.clearFilter",
+          "when": "view == openspecExplorer && viewItem == category-changes-filtered",
+          "group": "inline@0"
+        },
         {
           "command": "openspec.runTasks",
           "when": "view == openspecExplorer && viewItem == change-runnable",

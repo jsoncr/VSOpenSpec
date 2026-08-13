@@ -3,7 +3,7 @@
   "command.refresh.title": "Refresh",
   "command.preview.title": "Preview",
   "command.openSource.title": "Open source file",
-  "command.collapseAll.title": "Collapse all",
+  "command.clearFilter.title": "Clear filter",
   "command.runTasks.title": "Run pending tasks",
   "command.archive.title": "Archive change",
   "command.closeSpec.title": "Close spec (create deprecation change)",

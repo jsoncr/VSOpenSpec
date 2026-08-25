@@ -1,4 +1,4 @@
-// Punto de entrada de la extensión OpenSpec Previewer.
+// Punto de entrada de la extensión OpenSpec Viewer.
 import * as path from "path";
 import * as vscode from "vscode";
 import { OpenSpecTreeProvider, OSNode } from "./tree/treeProvider";

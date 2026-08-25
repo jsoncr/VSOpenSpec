@@ -1,4 +1,4 @@
-# OpenSpec Previewer
+# OpenSpec Viewer
 
 A dedicated VS Code extension to preview and navigate [OpenSpec](https://openspec.dev/) projects without opening every `.md` file by hand.
 
@@ -11,6 +11,14 @@ Interactive task tree and themed `tasks.md` preview with live progress:
 Per-change inline actions (run pending tasks / archive), active specs and archived changes:
 
 ![OpenSpec change actions, specs and archive](media/screenshot002.png)
+
+### Dashboard
+
+Analytics dashboard with KPIs, a linear **progress map** and a **mind map** of every change and its sections, colored by progress — with Active / Archived tabs:
+
+![OpenSpec dashboard: KPIs, progress map and mind map](media/screenshot004.png)
+
+![OpenSpec dashboard overview](media/screenshot003.png)
 
 ## Features
 
@@ -52,6 +60,7 @@ The extension is localized and follows the VS Code display language:
 |---|---|---|
 | `openspec.applyCommand` | `claude "/openspec:apply ${changeId}"` | Agent command used to apply tasks. Variables: `${changeId}`, `${cwd}`. |
 | `openspec.archiveCommand` | `openspec archive ${changeId} -y` | Command used to archive a change. Variables: `${changeId}`, `${cwd}`. |
+| `openspec.proposalCommand` | `claude "/openspec:proposal ${description}"` | Agent command used to create a new proposal. Variables: `${description}`, `${cwd}`. |
 | `openspec.autoRunApply` | `false` | When `true`, the apply command runs instantly instead of only being written to the terminal. |
 
 ## Commands
@@ -61,10 +70,17 @@ The extension is localized and follows the VS Code display language:
 | `OpenSpec: Refresh` | Reloads the tree. |
 | `OpenSpec: Preview` | Opens the rendered preview of a file. |
 | `OpenSpec: Open source file` | Opens the underlying `.md`. |
-| `OpenSpec: Collapse all` | Collapses the whole tree. |
+| `OpenSpec: New proposal` | Prompts for a description and launches the agent to create a proposal. |
+| `OpenSpec: Open dashboard` | Opens the analytics dashboard. |
 | `OpenSpec: Run pending tasks` | Sends the agent command to the terminal. |
 | `OpenSpec: Archive change` | Archives a completed change. |
 | `OpenSpec: Close spec (create deprecation change)` | Creates a deprecation change for an active spec. |
+| `OpenSpec: Show impact (diff vs active spec)` | Opens a diff of a spec delta against the active spec. |
+| `OpenSpec: Search changes` | Filters active changes by id. |
+| `OpenSpec: Filter changes` | Filters active changes by state (all / pending / completed). |
+| `OpenSpec: Clear filter` | Clears the active search/filter. |
+| `OpenSpec: Initialize OpenSpec` | Runs `openspec init` to scaffold a project. |
+| `OpenSpec: Install OpenSpec CLI` | Runs the command to install the OpenSpec CLI. |
 
 ## Recognized OpenSpec structure
 

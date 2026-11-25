@@ -9,6 +9,7 @@ import {
   OpenSpecProject,
 } from "./model";
 import { computeStats, readTasks } from "./tasks";
+import { isQuestionArtifact, readQuestions } from "./questions";
 
 /** Nombres de carpetas que nunca vale la pena recorrer al buscar openspec/. */
 const IGNORED_DIRS = new Set([
@@ -150,6 +151,17 @@ function readChange(changeDir: string, archived: boolean): Change {
     artifacts,
     specDeltas,
   };
+
+  // Precalcula las preguntas abiertas pendientes solo en proposal/design de
+  // cambios activos; la presencia del campo (incluso vacío) marca el artefacto
+  // como editable. Los archivados nunca lo llevan.
+  if (!archived) {
+    for (const art of artifacts) {
+      if (isQuestionArtifact(art.kind)) {
+        art.questions = readQuestions(art.fsPath);
+      }
+    }
+  }
 
   if (tasksArtifact) {
     change.tasksPath = tasksArtifact.fsPath;

@@ -4,6 +4,7 @@ import * as vscode from "vscode";
 import { OpenSpecTreeProvider, OSNode } from "./tree/treeProvider";
 import { PreviewPanel } from "./preview/previewPanel";
 import { toggleTaskLine } from "./openspec/tasks";
+import { readQuestions } from "./openspec/questions";
 import { Change, OpenSpecProject } from "./openspec/model";
 import { createDeprecationChange } from "./openspec/deprecate";
 import { DashboardPanel } from "./dashboard/dashboardPanel";
@@ -91,6 +92,21 @@ export function activate(context: vscode.ExtensionContext): void {
   });
   context.subscriptions.push(treeView);
 
+  // Badge de la vista con el total de preguntas abiertas en cambios activos
+  // (sin filtrar); undefined cuando queda en 0.
+  treeProvider.onQuestionsChanged = (total) => {
+    treeView.badge =
+      total > 0
+        ? {
+            value: total,
+            tooltip: vscode.l10n.t(
+              "{0} open question(s) in active changes",
+              total
+            ),
+          }
+        : undefined;
+  };
+
   // Colección de diagnósticos para volcar los issues de validación al panel Problemas.
   const diagnostics = vscode.languages.createDiagnosticCollection("openspec");
   context.subscriptions.push(diagnostics);
@@ -155,8 +171,11 @@ export function activate(context: vscode.ExtensionContext): void {
   context.subscriptions.push(
     vscode.commands.registerCommand("openspec.preview", (node: OSNode) => {
       if (node?.artifact) {
-        PreviewPanel.show(context.extensionUri, node.artifact, () =>
-          treeProvider.refresh()
+        PreviewPanel.show(
+          context.extensionUri,
+          node.artifact,
+          () => treeProvider.refresh(),
+          node.questionLine
         );
       }
     })
@@ -270,13 +289,15 @@ export function activate(context: vscode.ExtensionContext): void {
       try {
         const result = createDeprecationChange(spec);
         treeProvider.refresh();
-        // Abrimos la propuesta generada en el preview.
+        // Abrimos la propuesta generada en el preview; al ser un artefacto
+        // activo recién creado se propaga el permiso de edición de preguntas.
         PreviewPanel.show(
           context.extensionUri,
           {
             label: vscode.l10n.t("Proposal"),
             kind: "proposal",
             fsPath: result.proposalPath,
+            questions: readQuestions(result.proposalPath),
           },
           () => treeProvider.refresh()
         );

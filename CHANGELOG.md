@@ -5,6 +5,14 @@ All notable changes to the "OpenSpec Viewer" extension are documented in this fi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.13] - 2026-11-25
+
+### Added
+
+- OpenSpec sidebar badge and an **Open Questions** group under each change to surface unresolved questions and pending decisions in `proposal.md` and `design.md`.
+- Answer open questions directly from the preview. Each answer is saved to the original Markdown file, and the question is removed from the pending list.
+- English and Spanish labels and messages for the open questions workflow, following the VS Code display language.
+
 ## [0.4.5] - 2026-08-19
 
 ### Added

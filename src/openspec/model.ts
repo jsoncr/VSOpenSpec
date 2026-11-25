@@ -1,4 +1,5 @@
 // Tipos de dominio que describen un proyecto OpenSpec y sus artefactos.
+import { OpenQuestion } from "./questions";
 
 /** Un archivo de artefacto (proposal.md, design.md, tasks.md, spec.md). */
 export interface ArtifactFile {
@@ -8,6 +9,12 @@ export interface ArtifactFile {
   fsPath: string;
   /** Tipo de artefacto para decidir el modo de render en el preview. */
   kind: "proposal" | "design" | "tasks" | "spec" | "generic";
+  /**
+   * Preguntas abiertas pendientes. Solo presente en proposal/design de
+   * cambios activos (incluso cuando está vacío): su presencia autoriza la
+   * edición de respuestas desde el preview.
+   */
+  questions?: OpenQuestion[];
 }
 
 /** Una tarea individual dentro de tasks.md. */

@@ -76,5 +76,21 @@
   "Velocity (tasks completed per week)": "Velocidad (tareas completadas por semana)",
   "Progress map": "Mapa de progreso",
   "Mind map": "Mapa mental",
-  "week of {0}": "semana del {0}"
+  "week of {0}": "semana del {0}",
+  "Open Questions": "Preguntas abiertas",
+  "{0} open question(s)": "{0} pregunta(s) abierta(s)",
+  "{0} open question(s) in active changes": "{0} pregunta(s) abierta(s) en cambios activos",
+  "Answer question": "Responder pregunta",
+  "line {0}": "línea {0}",
+  "Type the answer…": "Escribe la respuesta…",
+  "Save answer": "Guardar respuesta",
+  "Answer saved.": "Respuesta guardada.",
+  "The answer is empty.": "La respuesta está vacía.",
+  "{0} has unsaved changes. Save or revert them before answering.": "{0} tiene cambios sin guardar. Guárdalos o reviértelos antes de responder.",
+  "The file changed since the preview was rendered. It will be refreshed.": "El archivo cambió desde que se generó la vista previa. Se refrescará.",
+  "The file changed while the answer was being applied. Nothing was saved; review the file in the editor.": "El archivo cambió mientras se aplicaba la respuesta. No se guardó nada; revisa el archivo en el editor.",
+  "The question is no longer pending or its block changed. The preview will be refreshed.": "La pregunta ya no está pendiente o su bloque cambió. Se refrescará la vista previa.",
+  "Could not apply the edit to insert the answer.": "No se pudo aplicar la edición para insertar la respuesta.",
+  "Could not save {0}.": "No se pudo guardar {0}.",
+  "Could not save the answer: {0}": "No se pudo guardar la respuesta: {0}"
 }

@@ -40,6 +40,22 @@ Analytics dashboard with KPIs, a linear **progress map** and a **mind map** of e
 - **Filter & search**: filter active changes (all / only pending / only completed) and search by id from the view toolbar.
 - **Initialize OpenSpec**: when no `openspec/` is found, the welcome view offers a button that runs `openspec init`.
 - **Dashboard** (📊 in the view toolbar): a full analytics page with charts — KPIs, completion donut, progress distribution, **linear progress map** (colored by progress), **velocity** (tasks completed per week), per-change bars, monthly bars and a timeline table; with **Active / Archived** tabs.
+- **Open questions**: pending questions declared in `proposal.md`/`design.md` appear under the change (and in the sidebar badge) and can be answered from the preview.
+
+### Preguntas abiertas (proposal/design)
+
+Los cambios activos pueden declarar preguntas pendientes en `proposal.md` o `design.md` dentro de una sección llamada `## Open Questions` (también `## Unresolved Question(s)`, `## Pending Decision(s)`, `## Preguntas abiertas`, `## Asuntos pendientes` o `## Decisiones pendientes`), o con los prefijos `Open Question:` / `Pregunta abierta:` / `Pending Decision:` / `Asunto pendiente:` en cualquier párrafo o ítem:
+
+```markdown
+## Preguntas abiertas
+
+- [ ] ¿Qué motor de base de datos se usará?
+- ¿Cuál es el formato de exportación?
+
+**Asunto pendiente:** ¿Se mantiene compatibilidad con v1?
+```
+
+Aparecen en el árbol bajo el grupo **Open Questions** (y en el badge del panel lateral). En el preview del artefacto cada pregunta tiene un cuadro de respuesta; al guardarla se inserta en el propio `.md` como `> **Answer:** …` y deja de mostrarse como pendiente.
 
 ## Languages
 

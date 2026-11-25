@@ -10,3 +10,5 @@ tsconfig.json
 *.vsix
 media/*.pdf
 media/logoospv.png
+
+test/**

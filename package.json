@@ -3,9 +3,9 @@
   "displayName": "OpenSpec Viewer",
   "description": "%description%",
   "l10n": "./l10n",
-  "version": "0.4.10",
-  "publisher": "jcruz",
-  "author": "jcruz",
+  "version": "0.4.13",
+  "publisher": "jsoncr",
+  "author": "jsoncr",
   "license": "MIT",
   "icon": "media/icon.png",
   "repository": {
@@ -265,6 +265,7 @@
     "watch": "node esbuild.js --watch",
     "package": "node esbuild.js --production",
     "lint": "tsc --noEmit",
+    "test": "node --test test/questions.test.mjs",
     "package:vsix": "npx @vscode/vsce package"
   },
   "dependencies": {

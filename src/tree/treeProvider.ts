@@ -6,6 +6,7 @@ import {
   Change,
   OpenSpecProject,
 } from "../openspec/model";
+import { OpenQuestion } from "../openspec/questions";
 import { readTasks } from "../openspec/tasks";
 import { scanWorkspace } from "../openspec/scanner";
 import { validateChange, ValidationResult } from "../openspec/validate";
@@ -22,6 +23,8 @@ type NodeKind =
   | "tasksGroup"
   | "taskSection"
   | "task"
+  | "questionsGroup"
+  | "question"
   | "spec";
 
 /** Nodo genérico del árbol. Se usa una unión laxa por comodidad. */
@@ -40,6 +43,8 @@ export interface OSNode {
   taskFsPath?: string;
   taskLine?: number;
   taskDone?: boolean;
+  /** Para nodos de pregunta: línea (0-based) de la pregunta en el artefacto. */
+  questionLine?: number;
   /** Hijos precalculados (secciones/tareas). */
   children?: OSNode[];
   /** Para la categoría de cambios: true si hay filtro/búsqueda activos. */
@@ -68,6 +73,9 @@ export class OpenSpecTreeProvider
     changes: Change[]
   ) => void;
 
+  /** Callback al refrescar con el total de preguntas abiertas (badge). */
+  onQuestionsChanged?: (total: number) => void;
+
   refresh(): void {
     this.projects = scanWorkspace();
     // Expone si hay proyectos para el viewsWelcome / context keys.
@@ -77,7 +85,19 @@ export class OpenSpecTreeProvider
       this.projects.length > 0
     );
     this._onDidChangeTreeData.fire();
+    this.onQuestionsChanged?.(this.pendingQuestionCount());
     void this.runValidationPass();
+  }
+
+  /** Total de preguntas abiertas en cambios activos, sin aplicar el filtro. */
+  pendingQuestionCount(): number {
+    let total = 0;
+    for (const project of this.projects) {
+      for (const change of project.activeChanges) {
+        total += pendingQuestionsOf(change).length;
+      }
+    }
+    return total;
   }
 
   getProjects(): OpenSpecProject[] {
@@ -168,6 +188,10 @@ export class OpenSpecTreeProvider
         return this.sectionItem(node);
       case "task":
         return this.taskItem(node);
+      case "questionsGroup":
+        return this.questionsGroupItem(node);
+      case "question":
+        return this.questionItem(node);
       case "spec":
         return this.specItem(node);
     }
@@ -187,6 +211,8 @@ export class OpenSpecTreeProvider
       case "tasksGroup":
         return node.children ?? [];
       case "taskSection":
+        return node.children ?? [];
+      case "questionsGroup":
         return node.children ?? [];
       default:
         return [];
@@ -294,6 +320,22 @@ export class OpenSpecTreeProvider
 
   private changeChildren(change: Change): OSNode[] {
     const nodes: OSNode[] = [];
+    // Primer grupo bajo el cambio: preguntas abiertas pendientes.
+    const questions = pendingQuestionsOf(change);
+    if (questions.length > 0) {
+      nodes.push({
+        kind: "questionsGroup",
+        label: vscode.l10n.t("Open Questions"),
+        description: `${questions.length}`,
+        children: questions.map(({ artifact, question }) => ({
+          kind: "question",
+          label: question.text,
+          description: `${artifact.label}:${question.line + 1}`,
+          artifact,
+          questionLine: question.line,
+        })),
+      });
+    }
     for (const art of change.artifacts) {
       if (art.kind === "tasks") {
         nodes.push(this.buildTasksGroup(change));
@@ -404,6 +446,7 @@ export class OpenSpecTreeProvider
 
     // Estado de validación: si es inválido, prima el icono de advertencia.
     const validation = this.validation.get(change.dirPath);
+    const pendingQuestions = pendingQuestionsOf(change).length;
     if (!change.archived && validation?.status === "invalid") {
       item.iconPath = new vscode.ThemeIcon(
         "warning",
@@ -412,6 +455,17 @@ export class OpenSpecTreeProvider
       item.tooltip = new vscode.MarkdownString(
         `**${vscode.l10n.t("Invalid change")}**\n\n` +
           validation.messages.map((m) => `- ${m}`).join("\n")
+      );
+    } else if (!change.archived && pendingQuestions > 0) {
+      // La validación tiene prioridad; si está válido, el warning marca las
+      // preguntas abiertas pendientes.
+      item.iconPath = new vscode.ThemeIcon(
+        "warning",
+        new vscode.ThemeColor("list.warningForeground")
+      );
+      item.tooltip = new vscode.MarkdownString(
+        `${change.dirPath}\n\n` +
+          vscode.l10n.t("{0} open question(s)", pendingQuestions)
       );
     } else {
       item.iconPath = new vscode.ThemeIcon(
@@ -467,6 +521,38 @@ export class OpenSpecTreeProvider
       title: "Preview",
       arguments: [node],
     };
+    return item;
+  }
+
+  private questionsGroupItem(node: OSNode): vscode.TreeItem {
+    const item = new vscode.TreeItem(
+      node.label,
+      vscode.TreeItemCollapsibleState.Collapsed
+    );
+    item.description = node.description;
+    item.iconPath = new vscode.ThemeIcon(
+      "warning",
+      new vscode.ThemeColor("list.warningForeground")
+    );
+    item.contextValue = "questionsGroup";
+    return item;
+  }
+
+  private questionItem(node: OSNode): vscode.TreeItem {
+    const item = new vscode.TreeItem(
+      node.label,
+      vscode.TreeItemCollapsibleState.None
+    );
+    item.description = node.description;
+    item.iconPath = new vscode.ThemeIcon("question");
+    item.contextValue = "question";
+    // Click abre el preview con el formulario de esa pregunta.
+    item.command = {
+      command: "openspec.preview",
+      title: vscode.l10n.t("Answer question"),
+      arguments: [node],
+    };
+    item.tooltip = node.artifact?.fsPath;
     return item;
   }
 
@@ -535,6 +621,19 @@ export class OpenSpecTreeProvider
       p.activeSpecs.length
     );
   }
+}
+
+/** Preguntas abiertas pendientes de un cambio, con su artefacto de origen. */
+function pendingQuestionsOf(
+  change: Change
+): Array<{ artifact: ArtifactFile; question: OpenQuestion }> {
+  const out: Array<{ artifact: ArtifactFile; question: OpenQuestion }> = [];
+  for (const art of change.artifacts) {
+    for (const question of art.questions ?? []) {
+      out.push({ artifact: art, question });
+    }
+  }
+  return out;
 }
 
 /** Formatea el porcentaje de avance; devuelve "0%" si no hay tareas. */

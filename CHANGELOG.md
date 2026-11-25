@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Open questions now carry their nearest group title — a subsection heading or a list item label ending in `:` — shown in the tree item description and above each answer form in the preview.
+
 ### Fixed
 
 - Open questions detection now finds nested list items: grouping labels (e.g. `**Informe por email (D13):**`) no longer hide the real questions under them, and questions in `Open Questions`-style sections require an explicit `?`, prefix, or unchecked `[ ]` — plain declarative items are only picked up inside `Pending Decisions`-style sections.

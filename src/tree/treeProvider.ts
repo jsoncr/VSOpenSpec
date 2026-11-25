@@ -330,7 +330,10 @@ export class OpenSpecTreeProvider
         children: questions.map(({ artifact, question }) => ({
           kind: "question",
           label: question.text,
-          description: `${artifact.label}:${question.line + 1}`,
+          // Con título de grupo va delante: "Grupo · artefacto:línea".
+          description: question.groupTitle
+            ? `${question.groupTitle} · ${artifact.label}:${question.line + 1}`
+            : `${artifact.label}:${question.line + 1}`,
           artifact,
           questionLine: question.line,
         })),

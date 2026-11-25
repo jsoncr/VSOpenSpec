@@ -253,6 +253,13 @@ export class PreviewPanel {
         return `
       <div class="question" data-question-line="${question.line}">
         <label class="question-label" for="${id}">
+          ${
+            question.groupTitle
+              ? `<span class="question-group-title">${escapeHtml(
+                  question.groupTitle
+                )}</span>`
+              : ""
+          }
           <span class="question-text">${escapeHtml(question.text)}</span>
           <span class="question-line">${escapeHtml(location)}</span>
         </label>
@@ -753,6 +760,7 @@ const STYLES = `
   .question { padding: 10px 0; border-top: 1px dashed var(--vscode-panel-border); border-radius: 5px; }
   .question:first-of-type { border-top: none; }
   .question-label { display: block; margin-bottom: 6px; }
+  .question-group-title { display: block; font-size: 11px; color: var(--vscode-descriptionForeground); margin-bottom: 2px; }
   .question-line { float: right; font-size: 11px; color: var(--vscode-descriptionForeground); }
   .question textarea {
     width: 100%;

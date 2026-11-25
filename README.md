@@ -48,16 +48,20 @@ Los cambios activos pueden declarar preguntas pendientes en `proposal.md` o `des
 
 En una sección de preguntas cuenta todo ítem de lista (a cualquier nivel) con `?` en su texto —aunque siga contexto o propuesta—, con prefijo explícito o con checkbox sin marcar `[ ]`; los ítems anidados también se detectan, así que un rótulo de agrupación no oculta sus subpreguntas. En una sección de decisiones además cuentan ítems declarativos, salvo rótulos que terminan en `:`. Marcar `[x]` resuelve solo su propio ítem, no las preguntas hijas.
 
+Si existe, la agrupación más cercana aparece como título de cada pregunta (en la descripción del árbol y encima del cuadro de respuesta): un subencabezado de la sección o un ítem estructural que termina en `:`.
+
 ```markdown
-## Preguntas abiertas
+# Preguntas abiertas
 
 - [ ] ¿Qué motor de base de datos se usará?
-- **Informe por email (D13):**
-  - ¿Quiénes lo reciben? Se propone el equipo de soporte.
-  - ¿A qué hora es el corte diario?
 
-**Asunto pendiente:** ¿Se mantiene compatibilidad con v1?
+## Informe por email (D13)
+
+- ¿Quiénes lo reciben? Se propone el equipo de soporte.
+- ¿A qué hora es el corte diario?
 ```
+
+Las dos preguntas de correo muestran «Informe por email (D13)». La primera, sobre la base de datos, no tiene título de grupo.
 
 Aparecen en el árbol bajo el grupo **Open Questions** (y en el badge del panel lateral). En el preview del artefacto cada pregunta tiene un cuadro de respuesta; al guardarla se inserta en el propio `.md` como `> **Answer:** …` y deja de mostrarse como pendiente (una línea `Answer:` o `Respuesta:` ya existente también la resuelve).
 

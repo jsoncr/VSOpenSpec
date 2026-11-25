@@ -44,18 +44,22 @@ Analytics dashboard with KPIs, a linear **progress map** and a **mind map** of e
 
 ### Preguntas abiertas (proposal/design)
 
-Los cambios activos pueden declarar preguntas pendientes en `proposal.md` o `design.md` dentro de una sección llamada `## Open Questions` (también `## Unresolved Question(s)`, `## Pending Decision(s)`, `## Preguntas abiertas`, `## Asuntos pendientes` o `## Decisiones pendientes`), o con los prefijos `Open Question:` / `Pregunta abierta:` / `Pending Decision:` / `Asunto pendiente:` en cualquier párrafo o ítem:
+Los cambios activos pueden declarar preguntas pendientes en `proposal.md` o `design.md` dentro de una sección de preguntas (`## Open Questions`, `## Unresolved Question(s)` o `## Preguntas abiertas`) o de decisiones (`## Pending Decision(s)`, `## Asuntos pendientes` o `## Decisiones pendientes`), o con los prefijos `Open Question:` / `Pregunta abierta:` / `Pending Decision:` / `Asunto pendiente:` en cualquier párrafo o ítem, incluso anidado.
+
+En una sección de preguntas cuenta todo ítem de lista (a cualquier nivel) con `?` en su texto —aunque siga contexto o propuesta—, con prefijo explícito o con checkbox sin marcar `[ ]`; los ítems anidados también se detectan, así que un rótulo de agrupación no oculta sus subpreguntas. En una sección de decisiones además cuentan ítems declarativos, salvo rótulos que terminan en `:`. Marcar `[x]` resuelve solo su propio ítem, no las preguntas hijas.
 
 ```markdown
 ## Preguntas abiertas
 
 - [ ] ¿Qué motor de base de datos se usará?
-- ¿Cuál es el formato de exportación?
+- **Informe por email (D13):**
+  - ¿Quiénes lo reciben? Se propone el equipo de soporte.
+  - ¿A qué hora es el corte diario?
 
 **Asunto pendiente:** ¿Se mantiene compatibilidad con v1?
 ```
 
-Aparecen en el árbol bajo el grupo **Open Questions** (y en el badge del panel lateral). En el preview del artefacto cada pregunta tiene un cuadro de respuesta; al guardarla se inserta en el propio `.md` como `> **Answer:** …` y deja de mostrarse como pendiente.
+Aparecen en el árbol bajo el grupo **Open Questions** (y en el badge del panel lateral). En el preview del artefacto cada pregunta tiene un cuadro de respuesta; al guardarla se inserta en el propio `.md` como `> **Answer:** …` y deja de mostrarse como pendiente (una línea `Answer:` o `Respuesta:` ya existente también la resuelve).
 
 ## Languages
 

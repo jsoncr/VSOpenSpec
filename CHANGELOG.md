@@ -5,6 +5,14 @@ All notable changes to the "OpenSpec Viewer" extension are documented in this fi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- Open questions detection now finds nested list items: grouping labels (e.g. `**Informe por email (D13):**`) no longer hide the real questions under them, and questions in `Open Questions`-style sections require an explicit `?`, prefix, or unchecked `[ ]` — plain declarative items are only picked up inside `Pending Decisions`-style sections.
+- Question text is extracted as visible Markdown text: formatting marks (`**`, backticks) and link destinations no longer leak into labels, and a `?` inside a link URL does not turn the item into a question.
+- Answers inserted for nested questions are written at the correct indentation under their own item, and an item's `Answer:`/`Respuesta:` resolves only that item, not its parent or children.
+
 ## [0.4.13] - 2026-11-25
 
 ### Added
